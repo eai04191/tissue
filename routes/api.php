@@ -3,6 +3,7 @@
 use App\MetadataResolver\MetadataResolver;
 use App\Utilities\Formatter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,12 @@ Route::get('/checkin/card', function (Request $request, MetadataResolver $resolv
             'image' => $resolved->image,
             'expires_at' => $resolved->expires_at
         ]);
+    }
+    if($metadata->image){
+        $url = parse_url($metadata->image);
+        $ip = gethostbyname($url["host"]);
+        $geoip = geoip($ip);
+        Log::debug($url["host"] . " " . $geoip["iso_code"] . " " . $geoip["country"]);
     }
 
     $response = response()->json($metadata);

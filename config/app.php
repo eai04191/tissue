@@ -178,6 +178,11 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ViewComposerServiceProvider::class,
 
+        /*
+         * GeoIP
+         */
+        \Torann\GeoIP\GeoIPServiceProvider::class,
+
     ],
 
     /*
