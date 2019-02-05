@@ -17,9 +17,9 @@ class SettingController extends Controller
     {
         $inputs = $request->all();
         $validator = Validator::make($inputs, [
-            'display_name' => 'required|string|max:20'
+            'display_name' => 'required|string|max:20',
         ], [], [
-            'display_name' => '名前'
+            'display_name' => '名前',
         ]);
 
         if ($validator->fails()) {
