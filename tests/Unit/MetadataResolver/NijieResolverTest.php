@@ -38,7 +38,7 @@ class NijieResolverTest extends TestCase
 
         $metadata = $resolver->resolve('https://nijie.info/view.php?id=258078');
         $this->assertEquals('騎乗位ルーミア | しょったれ', $metadata->title);
-        $this->assertEquals("最初は顔をZUN絵で描こうとか思っていたのだが、難しかったのでやめた", $metadata->description);
+        $this->assertEquals('最初は顔をZUN絵で描こうとか思っていたのだが、難しかったのでやめた', $metadata->description);
         $this->assertRegExp('~/nijie\.info/pic/logo~', $metadata->image);
     }
 
@@ -84,7 +84,7 @@ class NijieResolverTest extends TestCase
 
         $metadata = $resolver->resolve('https://sp.nijie.info/view.php?id=258078');
         $this->assertEquals('騎乗位ルーミア | しょったれ', $metadata->title);
-        $this->assertEquals("最初は顔をZUN絵で描こうとか思っていたのだが、難しかったのでやめた", $metadata->description);
+        $this->assertEquals('最初は顔をZUN絵で描こうとか思っていたのだが、難しかったのでやめた', $metadata->description);
         $this->assertRegExp('~/nijie\.info/pic/logo~', $metadata->image);
     }
 

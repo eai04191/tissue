@@ -29,7 +29,7 @@ class IwaraResolver implements Resolver
                 $poster = $node->getAttribute('poster');
                 if (!empty($poster)) {
                     if (strpos($poster, '//') === 0) {
-                        $poster = 'https:' . $poster;
+                        $poster = 'https:'.$poster;
                     }
                     $metadata->image = $poster;
                     break;
@@ -41,7 +41,7 @@ class IwaraResolver implements Resolver
                     $src = $node->getAttribute('src');
                     if (preg_match('~youtube\.com/embed/(\S+)\?~', $src, $matches) !== -1) {
                         $youtubeId = $matches[1];
-                        $iwaraThumbUrl = 'https://i.iwara.tv/sites/default/files/styles/thumbnail/public/video_embed_field_thumbnails/youtube/' . $youtubeId . '.jpg';
+                        $iwaraThumbUrl = 'https://i.iwara.tv/sites/default/files/styles/thumbnail/public/video_embed_field_thumbnails/youtube/'.$youtubeId.'.jpg';
 
                         $metadata->image = $iwaraThumbUrl;
                         break;

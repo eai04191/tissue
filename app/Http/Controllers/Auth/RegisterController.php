@@ -42,15 +42,16 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
     {
         $rules = [
-            'name' => 'required|string|regex:/^[a-zA-Z0-9_-]+$/u|max:15|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed'
+            'name'     => 'required|string|regex:/^[a-zA-Z0-9_-]+$/u|max:15|unique:users',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
         ];
 
         // reCAPTCHAのキーが設定されている場合、判定を有効化
@@ -62,25 +63,26 @@ class RegisterController extends Controller
             $data,
             $rules,
             ['name.regex' => 'ユーザー名には半角英数字とアンダーバー、ハイフンのみ使用できます。'],
-            ['name' => 'ユーザー名']
+            ['name'       => 'ユーザー名']
         );
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return \App\User
      */
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
-            'display_name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'is_protected' => $data['is_protected'] ?? false,
-            'accept_analytics' => $data['accept_analytics'] ?? false
+            'name'             => $data['name'],
+            'display_name'     => $data['name'],
+            'email'            => $data['email'],
+            'password'         => bcrypt($data['password']),
+            'is_protected'     => $data['is_protected'] ?? false,
+            'accept_analytics' => $data['accept_analytics'] ?? false,
         ]);
     }
 }

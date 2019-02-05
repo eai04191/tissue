@@ -16,7 +16,9 @@ class Formatter
 
     /**
      * 通算秒数を日数と時分にフォーマットします。
+     *
      * @param int|float $value 通算秒数
+     *
      * @return string "xx日 xx時間 xx分" 形式でフォーマットされた文字列
      */
     public function formatInterval($value)
@@ -30,7 +32,9 @@ class Formatter
 
     /**
      * テキスト内のURLをHTMLのリンクに置き換えます。
+     *
      * @param string $text テキスト
+     *
      * @return string URLをリンクに置き換えた文字列
      */
     public function linkify($text)
@@ -40,7 +44,9 @@ class Formatter
 
     /**
      * URLを正規化します。
+     *
      * @param string $url URL
+     *
      * @return string 正規化されたURL
      */
     public function normalizeUrl($url)
@@ -54,10 +60,10 @@ class Formatter
         // Sort query parameters
         $query = parse_url($url, PHP_URL_QUERY);
         if (!empty($query)) {
-            $url = str_replace_last('?' . $query, '', $url);
+            $url = str_replace_last('?'.$query, '', $url);
             parse_str($query, $params);
             ksort($params);
-            $url = $url . '?' . http_build_query($params);
+            $url = $url.'?'.http_build_query($params);
         }
 
         return $url;

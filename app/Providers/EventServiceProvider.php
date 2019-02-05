@@ -14,8 +14,8 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         'App\Events\LinkDiscovered' => [
-            'App\Listeners\LinkCollector'
-        ]
+            'App\Listeners\LinkCollector',
+        ],
     ];
 
     /**

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Information;
-use Illuminate\Http\Request;
 
 class InfoController extends Controller
 {
@@ -17,7 +16,7 @@ class InfoController extends Controller
 
         return view('info.index')->with([
             'informations' => $informations,
-            'categories' => Information::CATEGORIES
+            'categories'   => Information::CATEGORIES,
         ]);
     }
 
@@ -26,8 +25,8 @@ class InfoController extends Controller
         $information = Information::findOrFail($id);
 
         return view('info.show')->with([
-            'info' => $information,
-            'category' => Information::CATEGORIES[$information->category]
+            'info'     => $information,
+            'category' => Information::CATEGORIES[$information->category],
         ]);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Ejaculation;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -83,7 +82,7 @@ SQL
         ))
             ->where('user_id', $user->id)
             ->groupBy(DB::raw("to_char(ejaculated_date, 'HH24')"))
-            ->orderBy(DB::raw("1"))
+            ->orderBy(DB::raw('1'))
             ->get();
 
         $dailySum = [];
@@ -121,7 +120,7 @@ SQL
         }
 
         foreach ($groupByHour as $data) {
-            $hour = (int)$data->hour;
+            $hour = (int) $data->hour;
             $hourlySum[$hour] += $data->count;
         }
 

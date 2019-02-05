@@ -11,11 +11,11 @@ class Ejaculation extends Model
     protected $fillable = [
         'user_id', 'ejaculated_date',
         'note', 'geo_latitude', 'geo_longitude', 'link',
-        'is_private'
+        'is_private',
     ];
 
     protected $dates = [
-        'ejaculated_date'
+        'ejaculated_date',
     ];
 
     public function user()
