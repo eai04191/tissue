@@ -12,14 +12,14 @@ class KomifloResolver implements Resolver
         $id = $matches[1];
 
         $client = new \GuzzleHttp\Client();
-        $res = $client->get('https://api.komiflo.com/content/id/' . $id);
+        $res = $client->get('https://api.komiflo.com/content/id/'.$id);
         if ($res->getStatusCode() === 200) {
             $json = json_decode($res->getBody()->getContents(), true);
             $metadata = new Metadata();
 
             $metadata->title = $json['content']['data']['title'] ?? '';
-            $metadata->description = ($json['content']['attributes']['artists']['children'][0]['data']['name'] ?? '?') .
-                ' - ' .
+            $metadata->description = ($json['content']['attributes']['artists']['children'][0]['data']['name'] ?? '?').
+                ' - '.
                 ($json['content']['parents'][0]['data']['title'] ?? '?');
 
             return $metadata;

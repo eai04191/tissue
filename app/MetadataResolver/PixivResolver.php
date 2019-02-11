@@ -5,7 +5,7 @@ namespace App\MetadataResolver;
 class PixivResolver implements Resolver
 {
     /**
-     * サムネイル画像 URL から最大長辺 1200px の画像 URL に変換する
+     * サムネイル画像 URL から最大長辺 1200px の画像 URL に変換する.
      *
      * @param string $thumbnailUrl サムネイル画像 URL
      *

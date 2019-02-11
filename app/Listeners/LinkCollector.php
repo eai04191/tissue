@@ -7,8 +7,6 @@ use App\Metadata;
 use App\MetadataResolver\MetadataResolver;
 use App\Utilities\Formatter;
 use GuzzleHttp\Exception\TransferException;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
 class LinkCollector
@@ -32,7 +30,8 @@ class LinkCollector
     /**
      * Handle the event.
      *
-     * @param  LinkDiscovered  $event
+     * @param LinkDiscovered $event
+     *
      * @return void
      */
     public function handle(LinkDiscovered $event)
@@ -47,14 +46,14 @@ class LinkCollector
             try {
                 $resolved = $this->metadataResolver->resolve($url);
                 Metadata::updateOrCreate(['url' => $url], [
-                    'title' => $resolved->title,
+                    'title'       => $resolved->title,
                     'description' => $resolved->description,
-                    'image' => $resolved->image,
-                    'expires_at' => $resolved->expires_at
+                    'image'       => $resolved->image,
+                    'expires_at'  => $resolved->expires_at,
                 ]);
             } catch (TransferException $e) {
                 // 何らかの通信エラーによってメタデータの取得に失敗した時、とりあえずエラーログにURLを残す
-                Log::error(self::class . ': メタデータの取得に失敗 URL=' . $url);
+                Log::error(self::class.': メタデータの取得に失敗 URL='.$url);
                 report($e);
             }
         }
