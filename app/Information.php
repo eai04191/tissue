@@ -13,7 +13,7 @@ class Information extends Model
         0 => ['label' => 'お知らせ', 'class' => 'badge-info'],
         1 => ['label' => 'アップデート', 'class' => 'badge-success'],
         2 => ['label' => '不具合情報', 'class' => 'badge-danger'],
-        3 => ['label' => 'メンテナンス', 'class' => 'badge-warning']
+        3 => ['label' => 'メンテナンス', 'class' => 'badge-warning'],
     ];
 
     protected $dates = ['deleted_at'];

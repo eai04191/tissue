@@ -16,12 +16,12 @@ class EjaculationController extends Controller
     public function create(Request $request)
     {
         $defaults = [
-            'date' => $request->input('date', date('Y/m/d')),
-            'time' => $request->input('time', date('H:i')),
-            'link' => $request->input('link', ''),
-            'tags' => $request->input('tags', ''),
-            'note' => $request->input('note', ''),
-            'is_private' => $request->input('is_private', 0) == 1
+            'date'       => $request->input('date', date('Y/m/d')),
+            'time'       => $request->input('time', date('H:i')),
+            'link'       => $request->input('link', ''),
+            'tags'       => $request->input('tags', ''),
+            'note'       => $request->input('note', ''),
+            'is_private' => $request->input('is_private', 0) == 1,
         ];
 
         return view('ejaculation.checkin')->with('defaults', $defaults);
@@ -43,7 +43,7 @@ class EjaculationController extends Controller
         ])->after(function ($validator) use ($request, $inputs) {
             // 日時の重複チェック
             if (!$validator->errors()->hasAny(['date', 'time'])) {
-                $dt = $inputs['date'] . ' ' . $inputs['time'];
+                $dt = $inputs['date'].' '.$inputs['time'];
                 if (Ejaculation::where(['user_id' => Auth::id(), 'ejaculated_date' => $dt])->count()) {
                     $validator->errors()->add('datetime', '既にこの日時にチェックインしているため、登録できません。');
                 }
@@ -55,11 +55,11 @@ class EjaculationController extends Controller
         }
 
         $ejaculation = Ejaculation::create([
-            'user_id' => Auth::id(),
-            'ejaculated_date' => Carbon::createFromFormat('Y/m/d H:i', $inputs['date'] . ' ' . $inputs['time']),
-            'note' => $inputs['note'] ?? '',
-            'link' => $inputs['link'] ?? '',
-            'is_private' => $request->has('is_private') ?? false
+            'user_id'         => Auth::id(),
+            'ejaculated_date' => Carbon::createFromFormat('Y/m/d H:i', $inputs['date'].' '.$inputs['time']),
+            'note'            => $inputs['note'] ?? '',
+            'link'            => $inputs['link'] ?? '',
+            'is_private'      => $request->has('is_private') ?? false,
         ]);
 
         $tagIds = [];
@@ -126,7 +126,7 @@ class EjaculationController extends Controller
         ])->after(function ($validator) use ($id, $request, $inputs) {
             // 日時の重複チェック
             if (!$validator->errors()->hasAny(['date', 'time'])) {
-                $dt = $inputs['date'] . ' ' . $inputs['time'];
+                $dt = $inputs['date'].' '.$inputs['time'];
                 if (Ejaculation::where(['user_id' => Auth::id(), 'ejaculated_date' => $dt])->where('id', '<>', $id)->count()) {
                     $validator->errors()->add('datetime', '既にこの日時にチェックインしているため、登録できません。');
                 }
@@ -138,10 +138,10 @@ class EjaculationController extends Controller
         }
 
         $ejaculation->fill([
-            'ejaculated_date' => Carbon::createFromFormat('Y/m/d H:i', $inputs['date'] . ' ' . $inputs['time']),
-            'note' => $inputs['note'] ?? '',
-            'link' => $inputs['link'] ?? '',
-            'is_private' => $request->has('is_private') ?? false
+            'ejaculated_date' => Carbon::createFromFormat('Y/m/d H:i', $inputs['date'].' '.$inputs['time']),
+            'note'            => $inputs['note'] ?? '',
+            'link'            => $inputs['link'] ?? '',
+            'is_private'      => $request->has('is_private') ?? false,
         ])->save();
 
         $tagIds = [];

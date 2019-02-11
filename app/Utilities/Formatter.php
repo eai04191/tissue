@@ -16,7 +16,9 @@ class Formatter
 
     /**
      * 通算秒数を日数と時分にフォーマットします。
+     *
      * @param int|float $value 通算秒数
+     *
      * @return string "xx日 xx時間 xx分" 形式でフォーマットされた文字列
      */
     public function formatInterval($value)
@@ -30,7 +32,9 @@ class Formatter
 
     /**
      * テキスト内のURLをHTMLのリンクに置き換えます。
+     *
      * @param string $text テキスト
+     *
      * @return string URLをリンクに置き換えた文字列
      */
     public function linkify($text)
@@ -40,7 +44,9 @@ class Formatter
 
     /**
      * URLを正規化します。
+     *
      * @param string $url URL
+     *
      * @return string 正規化されたURL
      */
     public function normalizeUrl($url)
@@ -55,10 +61,10 @@ class Formatter
         $parts = parse_url($url);
         if (!empty($parts['query'])) {
             // Remove query parameters
-            $url = str_replace_last('?' . $parts['query'], '', $url);
+            $url = str_replace_last('?'.$parts['query'], '', $url);
             if (!empty($parts['fragment'])) {
                 // Remove fragment identifier
-                $url = str_replace_last('#' . $parts['fragment'], '', $url);
+                $url = str_replace_last('#'.$parts['fragment'], '', $url);
             } else {
                 // "http://example.com/?query#" の場合 $parts['fragment'] は unset になるので、個別に判定して除去する必要がある
                 $url = preg_replace('/#\z/u', '', $url);
@@ -67,9 +73,9 @@ class Formatter
             parse_str($parts['query'], $params);
             ksort($params);
 
-            $url = $url . '?' . http_build_query($params);
+            $url = $url.'?'.http_build_query($params);
             if (!empty($parts['fragment'])) {
-                $url .= '#' . $parts['fragment'];
+                $url .= '#'.$parts['fragment'];
             }
         }
 

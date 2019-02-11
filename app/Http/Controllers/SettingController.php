@@ -18,12 +18,12 @@ class SettingController extends Controller
         $inputs = $request->all();
         $validator = Validator::make($inputs, [
             'display_name' => 'required|string|max:20',
-            'bio' => 'nullable|string|max:160',
-            'url' => 'nullable|url|max:2000'
+            'bio'          => 'nullable|string|max:160',
+            'url'          => 'nullable|url|max:2000',
         ], [], [
             'display_name' => '名前',
-            'bio' => '自己紹介',
-            'url' => 'URL'
+            'bio'          => '自己紹介',
+            'url'          => 'URL',
         ]);
 
         if ($validator->fails()) {
