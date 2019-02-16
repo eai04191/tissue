@@ -11,7 +11,7 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         $inputs = $request->validate([
-            'q' => 'required'
+            'q' => 'required',
         ]);
 
         $results = Ejaculation::query()
@@ -30,7 +30,7 @@ class SearchController extends Controller
     public function relatedTag(Request $request)
     {
         $inputs = $request->validate([
-            'q' => 'required'
+            'q' => 'required',
         ]);
 
         $results = Tag::query()
