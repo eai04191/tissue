@@ -28,7 +28,7 @@ class DeviantArtResolver implements Resolver
                 if (strpos($src, '/v1/fill/')) {
                     $src = preg_replace('~/v1/fill/w_\d+,h_\d+,q_\d+,strp~', '/v1/fit/w_700,h_700,q_70,strp', $src);
                 } else {
-                    $src = $src . '/v1/fit/w_700,h_700,q_70,strp/image.jpg';
+                    $src = $src.'/v1/fit/w_700,h_700,q_70,strp/image.jpg';
                 }
             }
 
