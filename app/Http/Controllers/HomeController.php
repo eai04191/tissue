@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Ejaculation;
 use App\Information;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -57,7 +56,7 @@ SQL
             $globalEjaculationCounts = [];
             $day = Carbon::now()->subDays(29);
             for ($i = 0; $i < 30; $i++) {
-                $globalEjaculationCounts[$day->format('Y/m/d') . ' の総チェックイン数'] = $groupByDay[$day->format('Y/m/d')] ?? 0;
+                $globalEjaculationCounts[$day->format('Y/m/d').' の総チェックイン数'] = $groupByDay[$day->format('Y/m/d')] ?? 0;
                 $day->addDay();
             }
 

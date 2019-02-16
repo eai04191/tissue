@@ -40,7 +40,7 @@ class OGPResolverTest extends TestCase
     {
         $resolver = new OGPResolver();
 
-        $html = <<<EOF
+        $html = <<<'EOF'
 <title>Welcome to my homepage</title>
 <meta name="description" content="This is my super hyper ultra homepage!!" />
 EOF;
