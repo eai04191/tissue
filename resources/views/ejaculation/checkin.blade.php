@@ -64,6 +64,8 @@
                             <div class="invalid-feedback">{{ $errors->first('link') }}</div>
                         @endif
                     </div>
+                    @component('components.card', ['link' => null])
+                    @endcomponent
                 </div>
                 <div class="form-row">
                     <div class="form-group col-sm-12">
@@ -148,5 +150,61 @@
             .on('click', function (ev) {
                 $('#tagInput').focus();
             });
+    </script>
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() { document.getElementById("link").onchange = linkChanged;},
+            false
+        );
+        function linkChanged(event) {
+            const card = document.querySelector(".link-card");
+            const url = event.target.value;
+            hiddenCard(card);
+            updateCard(card, url);
+            return null;
+        }
+        async function updateCard(card, url) {
+            const data = await getCardInfo(url);
+            card.querySelector(".card-title").innerHTML = data.title;
+            card.querySelector(".card-text").innerHTML = data.description;
+            if(data.image){
+                card.querySelector("img").src = data.image;
+            }else {
+                card.querySelector("img").classList.add("d-none");
+            }
+            card.classList.remove('col-md-6');
+
+            showCard(card);
+            return null;
+        }
+        function getCardInfo(url) {
+            return $.ajax({
+                url: '/api/checkin/card',
+                method: 'get',
+                type: 'json',
+                data: {
+                    url: url
+                }
+            }).then(function (data) {
+                console.log(data);
+                return data;
+            }).catch(function(e) {
+                console.log(e); // "oh, no!"
+                return {
+                    title: "Error",
+                    description: "Error",
+                    image: null
+                };
+            });
+        }
+        function showCard(card) {
+            card.classList.remove("d-none");
+            return null;
+        }
+        function hiddenCard(card) {
+            card.classList.add("d-none");
+            return null;
+        }
     </script>
 @endpush
