@@ -11,6 +11,7 @@ jobs:
           DB_DATABASE: tissue
           DB_USERNAME: tissue
           DB_PASSWORD: tissue
+          CODECOV_TOKEN: "a939ef7e-ef07-4713-935c-42f04b923a34"
       - image: circleci/postgres:10-alpine
         environment:
           POSTGRES_DB: tissue
