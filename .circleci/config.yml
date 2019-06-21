@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.5
+
 jobs:
   build:
     docker:
@@ -68,9 +72,12 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/phpunit
-            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml --coverage-html=/tmp/phpunit/coverage
+            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml --coverage-clover=/tmp/phpunit/coverage.xml
           when: always
       - store_test_results:
           path: /tmp/phpunit
       - store_artifacts:
-          path: /tmp/phpunit/coverage
+          path: /tmp/phpunit/coverage.xml
+
+      - codecov/upload:
+        file: /tmp/phpunit/coverage.xml
