@@ -67,7 +67,9 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/phpunit
-            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml
+            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml --coverage-html=/tmp/phpunit/coverage
           when: always
       - store_test_results:
           path: /tmp/phpunit
+      - store_artifacts:
+          path: /tmp/phpunit/coverage
