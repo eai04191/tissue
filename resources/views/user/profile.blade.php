@@ -31,6 +31,41 @@
     <p class="mt-4">
         <span class="oi oi-lock-locked"></span> このユーザはチェックイン履歴を公開していません。
     </p>
+@elseif (Route::currentRouteName() === 'user.okazu')
+    @push('script')
+        <script>
+            document.querySelectorAll(".okazu-card").forEach(card => {
+                const title = card.querySelector(".card-title");
+                const description = card.querySelector(".card-text");
+                const image = card.querySelector(".card-img");
+
+                const params = new URLSearchParams();
+                params.set('url', card.querySelector("a").href);
+
+                fetch("/api/checkin/card?" + params.toString())
+                    .then(response => response.json())
+                    .then(json => {
+                        if (json.image) {
+                            title.innerText = json.title;
+                            description.innerText = json.description;
+                            image.setAttribute("src", json.image);
+                            card.classList.remove("d-none");
+                        }
+                    })
+            });
+        </script>
+    @endpush
+
+    <div class="card-columns mt-3">
+        @forelse ($ejaculations as $ejaculation)
+            @component('components.okazu-card', ['link' => $ejaculation->link])
+            @endcomponent
+        @empty
+        <li class="list-group-item border-bottom-only">
+            <p>まだチェックインしていません。</p>
+        </li>
+        @endforelse
+    </div>
 @else
     <ul class="list-group">
         @forelse ($ejaculations as $ejaculation)
