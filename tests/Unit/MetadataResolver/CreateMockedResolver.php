@@ -45,8 +45,8 @@ trait CreateMockedResolver
             foreach ($responses as $response) {
                 if (is_array($response)) {
                     $response += [
-                        1 => [],
-                        2 => 200
+                        1 => $headers,
+                        2 => $status
                     ];
                     array_push($mockResponses, new Response($response[2], $response[1], $response[0]));
                 } else {
