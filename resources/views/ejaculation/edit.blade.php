@@ -68,8 +68,8 @@
                 <div class="form-row">
                     <div class="form-group col-sm-12">
                         <label for="note"><span class="oi oi-comment-square"></span> ノート</label>
-                        <textarea id="note" name="note" class="form-control {{ $errors->has('note') ? ' is-invalid' : '' }}" rows="4">{{ old('note') ?? $ejaculation->note }}</textarea>
-                        <small class="form-text text-muted">
+                        <textarea id="note" name="note" class="form-control {{ $errors->has('note') ? ' is-invalid' : '' }}" rows="4" v-on:input="onChangeNote">{{ old('note') ?? $ejaculation->note }}</textarea>
+                        <small id="note-character-counter" class="form-text text-muted">
                             最大 500 文字
                         </small>
                         @if ($errors->has('note'))

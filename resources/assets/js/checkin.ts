@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import TagInput from "./components/TagInput.vue";
 import MetadataPreview from './components/MetadataPreview.vue';
+import GraphemeSplitter from "grapheme-splitter";
 
 export const bus = new Vue({name: "EventBus"});
 
@@ -16,6 +17,7 @@ new Vue({
     data: {
         metadata: null,
         metadataLoadState: MetadataLoadState.Inactive,
+        noteLength: 0
     },
     components: {
         TagInput,
@@ -26,6 +28,16 @@ new Vue({
         const linkInput = this.$el.querySelector<HTMLInputElement>("#link");
         if (linkInput && /^https?:\/\//.test(linkInput.value)) {
             this.fetchMetadata(linkInput.value);
+        }
+    },
+    watch: {
+        noteLength: (length: number) => {
+            const counter = document.querySelector<HTMLElement>(
+                "#note-character-counter"
+            );
+            if (counter) {
+                counter.innerText = `残り ${500 - length} 文字`;
+            }
         }
     },
     methods: {
@@ -41,6 +53,14 @@ new Vue({
                 }
 
                 this.fetchMetadata(url);
+            }
+        },
+        onChangeNote(event: Event) {
+            if (event.target instanceof HTMLTextAreaElement) {
+                const splitter = new GraphemeSplitter();
+                this.noteLength = splitter.splitGraphemes(
+                    event.target.value
+                ).length;
             }
         },
         // メタデータの取得
