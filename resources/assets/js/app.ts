@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { fetchPostJson, fetchDeleteJson, ResponseError } from './fetch';
-import { linkCard, pageSelector, deleteCheckinModal, checkinMutedWarning } from './tissue';
+import { linkCard, linkCardGallary, pageSelector, deleteCheckinModal, checkinMutedWarning } from './tissue';
 
 require('./bootstrap');
 
@@ -24,6 +24,10 @@ $(() => {
     document.querySelectorAll('.tis-page-selector').forEach(pageSelector);
 
     document.querySelectorAll('.link-card').forEach(linkCard);
+
+    // TODO: すべてのカードの処理が終わってからmasonryを起動させる
+    document.querySelectorAll('.okazu-gallary .card').forEach(linkCardGallary);
+
     document.querySelectorAll('.tis-checkin-muted-warning').forEach(checkinMutedWarning);
 
     const elDeleteCheckinModal = document.getElementById('deleteCheckinModal');

@@ -8,6 +8,25 @@ export function suicide<T>(e: T) {
 
 const die = suicide('Element not found!');
 
+export function linkCardGallary(el: Element) {
+    const url = el.getAttribute('data-link');
+    if (!url) {
+        return;
+    }
+
+    fetchGet('/api/checkin/card', { url })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new ResponseError(response);
+        }).then(data => {
+            el.querySelector('img')?.setAttribute('src', data.image);
+            const title = el.querySelector<HTMLHeadingElement>('.card-title');
+            if (title) title.innerText = data.title
+        })
+}
+
 export function linkCard(el: Element) {
     const url = el.querySelector('a')?.href;
     if (!url) {
