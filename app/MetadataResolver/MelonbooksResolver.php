@@ -2,6 +2,7 @@
 
 namespace App\MetadataResolver;
 
+use App\Facades\Formatter;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 
@@ -26,14 +27,22 @@ class MelonbooksResolver implements Resolver
     {
         $cookieJar = CookieJar::fromArray(['AUTH_ADULT' => '1'], 'www.melonbooks.co.jp');
 
-        $res = $this->client->get($url, ['cookies' => $cookieJar]);
+        $curlopt = [];
+        if (!str_contains(curl_version()['ssl_version'], 'NSS/')) {
+            // OpenSSLを使用している場合、SECLEVELを下げて接続する
+            $curlopt[CURLOPT_SSL_CIPHER_LIST] = 'DEFAULT@SECLEVEL=1';
+        }
+        $res = $this->client->get($url, [
+            'cookies' => $cookieJar,
+            'curl' => $curlopt
+        ]);
         $metadata = $this->ogpResolver->parse($res->getBody());
 
         $dom = new \DOMDocument();
-        @$dom->loadHTML(mb_convert_encoding($res->getBody(), 'HTML-ENTITIES', 'UTF-8'));
+        @$dom->loadHTML(Formatter::htmlEntities($res->getBody(), 'UTF-8'));
         $xpath = new \DOMXPath($dom);
-        $descriptionNodelist = $xpath->query('//div[@id="description"]//p');
-        $specialDescriptionNodelist = $xpath->query('//div[@id="special_description"]//p');
+        $descriptionNodelist = $xpath->query('//div[contains(@class, "item-detail")]/*[contains(@class, "page-headline") and contains(text(), "作品詳細")]/following-sibling::div[1]');
+        $specialDescriptionNodelist = $xpath->query('//div[contains(@class, "item-detail")]/*[contains(@class, "page-headline") and contains(text(), "スタッフのオススメポイント")]/following-sibling::div[1]');
 
         // censoredフラグの除去
         if (mb_strpos($metadata->image, '&c=1') !== false) {
@@ -41,23 +50,19 @@ class MelonbooksResolver implements Resolver
         }
 
         // 抽出
-        preg_match('~^(.+)（(.+)）の通販・購入はメロンブックス$~', $metadata->title, $match);
+        preg_match('~^(.+)\((.+)\)の通販・購入はメロンブックス~', $metadata->title, $match);
         $title = $match[1];
         $maker = $match[2];
 
         // 整形
         $description = 'サークル: ' . $maker . "\n";
 
-        if ($specialDescriptionNodelist->length !== 0) {
-            $description .= trim(str_replace('<br>', "\n", $specialDescriptionNodelist->item(0)->nodeValue)) . "\n";
-            if ($specialDescriptionNodelist->length === 2) {
-                $description .= "\n";
-                $description .= trim(str_replace('<br>', "\n", $specialDescriptionNodelist->item(1)->nodeValue)) . "\n";
-            }
+        if ($descriptionNodelist->length !== 0) {
+            $description .= trim(str_replace("\r\n", "\n", $descriptionNodelist->item(0)->textContent)) . "\n\n";
         }
 
-        if ($descriptionNodelist->length !== 0) {
-            $description .= trim(str_replace('<br>', "\n", $descriptionNodelist->item(0)->nodeValue));
+        if ($specialDescriptionNodelist->length !== 0) {
+            $description .= trim(str_replace("\r\n", "\n", $specialDescriptionNodelist->item(0)->textContent));
         }
 
         $metadata->title = $title;

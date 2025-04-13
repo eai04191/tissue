@@ -21,7 +21,7 @@ class NicoSeigaResolverTest extends TestCase
 
     public function testSeiga()
     {
-        $responseText = file_get_contents(__DIR__ . '/../../fixture/NicoSeiga/seiga.html');
+        $responseText = $this->fetchSnapshot(__DIR__ . '/../../fixture/NicoSeiga/seiga.html');
 
         $this->createResolver(NicoSeigaResolver::class, $responseText);
 
@@ -37,12 +37,12 @@ class NicoSeigaResolverTest extends TestCase
 
     public function testShunga()
     {
-        $responseText = file_get_contents(__DIR__ . '/../../fixture/NicoSeiga/shunga.html');
+        $responseText = $this->fetchSnapshot(__DIR__ . '/../../fixture/NicoSeiga/shunga.html');
 
         $this->createResolver(NicoSeigaResolver::class, $responseText);
 
         $metadata = $this->resolver->resolve('https://seiga.nicovideo.jp/seiga/im9232798');
-        $this->assertSame('ベッドのゆかりさん / せゆーら/Se-U-Ra さんのイラスト', $metadata->title);
+        $this->assertSame('ベッドのゆかりさん / ゆらせー さんのイラスト', $metadata->title);
         $this->assertSame('待つ側の方がつよいってスマブラが伝えてきたので', $metadata->description);
         $this->assertSame('https://lohas.nicoseiga.jp/thumb/9232798l?', $metadata->image);
         $this->assertArrayContains(['結月ゆかり', 'VOICEROID'], $metadata->tags);

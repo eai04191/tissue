@@ -54,9 +54,9 @@ class FanzaResolver implements Resolver
         if (preg_match('~www\.dmm\.co\.jp/digital/(videoa|videoc|anime)/-/detail~', $url)) {
             $metadata = new Metadata();
             $metadata->title = trim($crawler->filter('#title')->text(''));
-            $metadata->description = trim($crawler->filter('.box-rank+table+div+div')->text(''));
+            $metadata->description = trim(strip_tags(str_replace('【FANZA(ファンザ)】', '', $crawler->filter('meta[name="description"]')->attr('content'))));
             $metadata->image = preg_replace("~(pr|ps)\.jpg$~", 'pl.jpg', $crawler->filter('meta[property="og:image"]')->attr('content'));
-            $metadata->tags = $this->array_finish($crawler->filter('.box-rank+table a:not([href="#review"])')->extract(['_text']));
+            $metadata->tags = $this->array_finish($crawler->filter('.box-rank+table a[href*="list/?"]')->extract(['_text']));
 
             return $metadata;
         }
@@ -70,7 +70,7 @@ class FanzaResolver implements Resolver
 
             $metadata = new Metadata();
             $metadata->title = $crawler->filter('meta[property="og:title"]')->attr('content');
-            $metadata->description = trim($crawler->filter('.summary__txt')->text(''));
+            $metadata->description = trim($crawler->filter('.summary__txt')->text('', false));
             $metadata->image = $crawler->filter('meta[property="og:image"]')->attr('content');
             $metadata->tags = array_merge($genre, [$crawler->filter('.circleName__txt')->text('')]);
 
@@ -78,12 +78,20 @@ class FanzaResolver implements Resolver
         }
 
         // 電子書籍
-        if (mb_strpos($url, 'book.dmm.co.jp/detail/') !== false) {
+        if (mb_strpos($url, 'book.dmm.co.jp/product/') !== false || mb_strpos($url, 'book.dmm.co.jp/detail/') !== false) {
+            $json = $crawler->filter('script[type="application/ld+json"]')->first()->text('', false);
+            $data = json_decode($json, true);
+
+            // DomCrawler内でjson内の日本語がHTMLエンティティに変換されるので、全要素に対してhtml_entity_decode
+            array_walk_recursive($data, function (&$v) {
+                $v = html_entity_decode($v);
+            });
+
             $metadata = new Metadata();
-            $metadata->title = trim($crawler->filter('#title')->text(''));
-            $metadata->description = trim($crawler->filter('.m-boxDetailProduct__info__story')->text(''));
+            $metadata->title = $data['name'];
+            $metadata->description = $data['description'];
             $metadata->image = preg_replace("~(pr|ps)\.jpg$~", 'pl.jpg', $crawler->filter('meta[property="og:image"]')->attr('content'));
-            $metadata->tags = $this->array_finish($crawler->filter('.m-boxDetailProductInfoMainList__description__list__item, .m-boxDetailProductInfo__list__description__item a')->extract(['_text']));
+            $metadata->tags = $this->array_finish([...$data['subjectOf']['author']['name'], $data['subjectOf']['publisher']['name'], ...$data['subjectOf']['genre']]);
 
             return $metadata;
         }
@@ -92,9 +100,9 @@ class FanzaResolver implements Resolver
         if (mb_strpos($url, 'dlsoft.dmm.co.jp/detail/') !== false) {
             $metadata = new Metadata();
             $metadata->title = trim($crawler->filter('#title')->text(''));
-            $metadata->description = trim($crawler->filter('.area-detail-read .text-overflow')->text(''));
+            $metadata->description = trim($crawler->filter('.area-detail-read .text-overflow')->text('', false));
             $metadata->image = preg_replace("~(pr|ps)\.jpg$~", 'pl.jpg', $crawler->filter('meta[property="og:image"]')->attr('content'));
-            $metadata->tags = $this->array_finish($crawler->filter('.area-bskt table a:not([href="#review"])')->extract(['_text']));
+            $metadata->tags = $this->array_finish($crawler->filter('.container02 table a[href*="list/article="]')->extract(['_text']));
 
             return $metadata;
         }

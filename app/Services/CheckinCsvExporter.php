@@ -25,13 +25,13 @@ class CheckinCsvExporter
     public function execute()
     {
         $csv = Writer::createFromPath($this->filename, 'wb');
-        $csv->setNewline("\r\n");
+        $csv->setEndOfLine("\r\n");
         if ($this->charset === 'SJIS-win') {
-            $csv->addStreamFilter('convert.mbstring.encoding.UTF-8:SJIS-win');
+            $csv->appendStreamFilterOnWrite('convert.mbstring.encoding.UTF-8:SJIS-win');
         }
 
-        $header = ['日時', 'ノート', 'オカズリンク', '非公開', 'センシティブ'];
-        for ($i = 1; $i <= 32; $i++) {
+        $header = ['日時', 'ノート', 'オカズリンク', '非公開', 'センシティブ', '経過時間リセット'];
+        for ($i = 1; $i <= 40; $i++) {
             $header[] = "タグ{$i}";
         }
         $csv->insertOne($header);
@@ -47,8 +47,9 @@ class CheckinCsvExporter
                             $ejaculation->link,
                             self::formatBoolean($ejaculation->is_private),
                             self::formatBoolean($ejaculation->is_too_sensitive),
+                            self::formatBoolean($ejaculation->discard_elapsed_time),
                         ];
-                        foreach ($ejaculation->tags->take(32) as $tag) {
+                        foreach ($ejaculation->tags->take(40) as $tag) {
                             $record[] = $tag->name;
                         }
                         $csv->insertOne($record);

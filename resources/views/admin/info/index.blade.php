@@ -22,7 +22,7 @@
                 <tr>
                     <td>
                         @if ($info->pinned)
-                            <span class="badge badge-secondary"><span class="oi oi-pin"></span>ピン留め</span>
+                            <span class="badge badge-secondary"><i class="ti ti-pinned-filled"></i>ピン留め</span>
                         @endif
                         <span class="badge {{ $categories[$info->category]['class'] }}">{{ $categories[$info->category]['label'] }}</span>
                     </td>
@@ -36,22 +36,6 @@
             @endforeach
             </tbody>
         </table>
-        <ul class="pagination mt-4 justify-content-center">
-            <li class="page-item {{ $informations->currentPage() === 1 ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ $informations->previousPageUrl() }}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">Previous</span>
-                </a>
-            </li>
-            @for ($i = 1; $i <= $informations->lastPage(); $i++)
-                <li class="page-item {{ $i === $informations->currentPage() ? 'active' : '' }}"><a href="{{ $informations->url($i) }}" class="page-link">{{ $i }}</a></li>
-            @endfor
-            <li class="page-item {{ $informations->currentPage() === $informations->lastPage() ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ $informations->nextPageUrl() }}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
-                </a>
-            </li>
-        </ul>
+        {{ $informations->links(null, ['className' => 'mt-4 justify-content-center']) }}
     </div>
 @endsection

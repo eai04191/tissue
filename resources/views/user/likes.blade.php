@@ -5,7 +5,7 @@
 @section('tab-content')
 @if (($user->is_protected || $user->private_likes) && !$user->isMe())
     <p class="mt-4">
-        <span class="oi oi-lock-locked"></span> このユーザはいいね一覧を公開していません。
+        <i class="ti ti-lock"></i> このユーザはいいね一覧を公開していません。
     </p>
 @else
     <ul class="list-group">
@@ -22,4 +22,7 @@
     </ul>
     {{ $likes->links(null, ['className' => 'mt-4 justify-content-center']) }}
 @endif
+
+@component('components.delete-checkin-modal')
+@endcomponent
 @endsection

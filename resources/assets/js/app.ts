@@ -1,8 +1,9 @@
 import Cookies from 'js-cookie';
+import $ from 'jquery';
 import { fetchPostJson, fetchDeleteJson, ResponseError } from './fetch';
-import { linkCard, pageSelector, deleteCheckinModal } from './tissue';
-
-require('./bootstrap');
+import { linkCard, pageSelector, deleteCheckinModal, checkinMutedWarning } from './tissue';
+import { initAddToCollectionButtons } from './collection';
+import 'bootstrap';
 
 $(() => {
     if (Cookies.get('agechecked')) {
@@ -19,11 +20,12 @@ $(() => {
     if (navigator.serviceWorker) {
         navigator.serviceWorker.register('/sw.js');
     }
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"], [data-tooltip="tooltip"]').tooltip();
     $('.alert').alert();
     document.querySelectorAll('.tis-page-selector').forEach(pageSelector);
 
     document.querySelectorAll('.link-card').forEach(linkCard);
+    document.querySelectorAll('.tis-checkin-muted-warning').forEach(checkinMutedWarning);
 
     const elDeleteCheckinModal = document.getElementById('deleteCheckinModal');
     if (elDeleteCheckinModal) {
@@ -55,7 +57,7 @@ $(() => {
                 })
                 .then((data) => {
                     $this.data('liked', false);
-                    $this.find('.oi-heart').removeClass('text-danger');
+                    $this.find('.ti-heart-filled').removeClass('text-danger');
 
                     const count = data.ejaculation ? data.ejaculation.likes_count : 0;
                     $this.find('.like-count').text(count ? count : '');
@@ -74,7 +76,7 @@ $(() => {
                 })
                 .then((data) => {
                     $this.data('liked', true);
-                    $this.find('.oi-heart').addClass('text-danger');
+                    $this.find('.ti-heart-filled').addClass('text-danger');
 
                     const count = data.ejaculation ? data.ejaculation.likes_count : 0;
                     $this.find('.like-count').text(count ? count : '');
@@ -91,9 +93,12 @@ $(() => {
         }
     });
 
-    $(document).on('click', '.card-spoiler-overlay', function (_event) {
+    $(document).on('click', '.card-spoiler-img-overlay', function (event) {
+        event.preventDefault();
         const $this = $(this);
-        $this.siblings('.card-link').removeClass('card-spoiler');
+        $this.closest('.card-link').removeClass('card-spoiler');
         $this.remove();
     });
+
+    initAddToCollectionButtons();
 });

@@ -14,7 +14,7 @@ class MetadataResolver implements Resolver
         '~komiflo\.com(/#!)?/comics/(\\d+)~' => KomifloResolver::class,
         '~www\.melonbooks\.co\.jp/detail/detail\.php~' => MelonbooksResolver::class,
         '~ec\.toranoana\.(jp|shop)/(tora|joshi)(_[rd]+)?/(ec|digi)/item/~' => ToranoanaResolver::class,
-        '~iwara\.tv/(videos|images)/.*~' => IwaraResolver::class,
+        '~((www|ecchi)\.)?iwara\.tv/(video|image)[s]?/\w+~' => IwaraResolver::class,
         '~www\.dlsite\.com/.*/(work|announce)/=/product_id/..\d+(\.html)?~' => DLsiteResolver::class,
         '~www\.dlsite\.com/.*/dlaf/=(/.+/.+)?/link/work/aid/.+(/id)?/..\d+(\.html)?~' => DLsiteResolver::class,
         '~www\.dlsite\.com/.*/dlaf/=/aid/.+/url/.+~' => DLsiteResolver::class,
@@ -22,19 +22,20 @@ class MetadataResolver implements Resolver
         '~www\.pixiv\.net/member_illust\.php\?illust_id=\d+~' => PixivResolver::class,
         '~www\.pixiv\.net/(en/)?artworks/\d+~' => PixivResolver::class,
         '~www\.pixiv\.net/user/\d+/series/\d+~' => PixivResolver::class,
+        '~www\.pixiv\.net/novel/show\.php\?id=\d+~' => PixivNovelResolver::class,
         '~fantia\.jp/posts/\d+~' => FantiaResolver::class,
         '~dmm\.co\.jp/~' => FanzaResolver::class,
         '~www\.patreon\.com/~' => PatreonResolver::class,
         '~www\.deviantart\.com/.*/art/.*~' => DeviantArtResolver::class,
-        '~\.syosetu\.com/n\d+[a-z]+~' => NarouResolver::class,
+        '~\.syosetu\.com/(novelview/infotop/ncode/)?n\d+[a-z]+~' => NarouResolver::class,
         '~ci-en\.(jp|net|dlsite\.com)/creator/\d+/article/\d+~' => CienResolver::class,
         '~www\.plurk\.com\/p\/.*~' => PlurkResolver::class,
-        '~(adult\.)?contents\.fc2\.com\/article_search\.php\?id=\d+~' => FC2ContentsResolver::class,
         '~store\.steampowered\.com/app/\d+~' => SteamResolver::class,
-        '~www\.xtube\.com/video-watch/.*-\d+$~'=> XtubeResolver::class,
         '~ss\.kb10uy\.org/posts/\d+$~' => Kb10uyShortStoryServerResolver::class,
-        '~www\.hentai-foundry\.com/pictures/user/.+/\d+/.+~'=> HentaiFoundryResolver::class,
-        '~(www\.)?((mobile|m)\.)?twitter\.com/(#!/)?[0-9a-zA-Z_]{1,15}/status(es)?/([0-9]+)/?(\\?.+)?$~' => TwitterResolver::class,
+        '~www\.hentai-foundry\.com/pictures/user/.+/\d+/.+~' => HentaiFoundryResolver::class,
+        '~(www\.)?((mobile|m)\.)?(twitter|x)\.com/(#!/)?[0-9a-zA-Z_]{1,15}/status(es)?/([0-9]+)(/photo/[1-4])?/?(\\?.+)?$~' => TwitterResolver::class,
+        '~www\.mgstage\.com/~' => MGStageResolver::class,
+        '~booth.pm/([a-z]+/)?items/[0-9]+~' => BoothResolver::class,
     ];
 
     public $mimeTypes = [
@@ -46,13 +47,17 @@ class MetadataResolver implements Resolver
 
     public $defaultResolver = OGPResolver::class;
 
+    public function __construct(private Client $client)
+    {
+    }
+
     public function resolve(string $url): Metadata
     {
         foreach ($this->rules as $pattern => $class) {
             if (preg_match($pattern, $url) === 1) {
                 try {
                     /** @var Resolver $resolver */
-                    $resolver = app($class);
+                    $resolver = app($class, ['client' => $this->client]);
 
                     return $resolver->resolve($url);
                 } catch (UnsupportedContentException $e) {
@@ -67,7 +72,7 @@ class MetadataResolver implements Resolver
 
         if (isset($this->defaultResolver)) {
             /** @var Resolver $resolver */
-            $resolver = app($this->defaultResolver);
+            $resolver = app($this->defaultResolver, ['client' => $this->client]);
 
             return $resolver->resolve($url);
         }
@@ -84,8 +89,7 @@ class MetadataResolver implements Resolver
             // Acceptヘッダには */* を足さないことにする。
             $acceptTypes = array_diff(array_keys($this->mimeTypes), ['*/*']);
 
-            $client = app(Client::class);
-            $res = $client->request('GET', $url, [
+            $res = $this->client->request('GET', $url, [
                 'headers' => [
                     'Accept' => implode(', ', $acceptTypes)
                 ]
@@ -97,14 +101,14 @@ class MetadataResolver implements Resolver
 
                 if (isset($this->mimeTypes[$mimeType])) {
                     $class = $this->mimeTypes[$mimeType];
-                    $parser = app($class);
+                    $parser = app($class, ['client' => $this->client]);
 
                     return $parser->parse($res->getBody());
                 }
 
                 if (isset($this->mimeTypes['*/*'])) {
                     $class = $this->mimeTypes['*/*'];
-                    $parser = app($class);
+                    $parser = app($class, ['client' => $this->client]);
 
                     return $parser->parse($res->getBody());
                 }

@@ -13,7 +13,8 @@
     @endif
 
     <link href="{{ asset('manifest.json') }}" rel="manifest">
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    @vite('resources/assets/sass/app.scss')
+    @viteReactRefresh
 
     @stack('head')
 </head>
@@ -43,21 +44,7 @@
                         <img src="{{ Auth::user()->getProfileImageUrl(30) }}" srcset="{{ Formatter::profileImageSrcSet(Auth::user(), 30) }}" width="30" height="30" class="rounded d-inline-block align-top">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right position-absolute" aria-labelledby="navbarDropdownMenuLink" id="navbarAccountDropdownSp">
-                        <a href="{{ route('user.profile', ['name' => Auth::user()->name]) }}" class="dropdown-item text-truncate">
-                            <strong>{{ Auth::user()->display_name }}</strong>
-                            <p class="mb-0 text-muted">
-                                <span>&commat;{{ Auth::user()->name }}</span>
-                            </p>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ route('user.profile', ['name' => Auth::user()->name]) }}" class="dropdown-item">プロフィール</a>
-                        <a href="{{ route('user.likes', ['name' => Auth::user()->name]) }}" class="dropdown-item">いいね</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ route('setting') }}" class="dropdown-item">設定</a>
-                        @can ('admin')
-                            <a href="{{ route('admin.dashboard') }}" class="dropdown-item">管理</a>
-                        @endcan
-                        <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
+                        @include('components.header-dropdown-menu')
                     </div>
                 </div>
             </div>
@@ -73,14 +60,8 @@
                         <li class="nav-item {{ stripos(Route::currentRouteName(), 'home') === 0 ? 'active' : ''}}">
                             <a class="nav-link" href="{{ route('home') }}">ホーム</a>
                         </li>
-                        <li class="nav-item {{ stripos(Route::currentRouteName(), 'user.profile') === 0 ? 'active' : ''}}">
-                            <a class="nav-link" href="{{ route('user.profile', ['name' => Auth::user()->name]) }}">タイムライン</a>
-                        </li>
-                        <li class="nav-item {{ stripos(Route::currentRouteName(), 'user.stats') === 0 ? 'active' : ''}}">
-                            <a class="nav-link" href="{{ route('user.stats', ['name' => Auth::user()->name]) }}">グラフ</a>
-                        </li>
-                        <li class="nav-item {{ stripos(Route::currentRouteName(), 'user.okazu') === 0 ? 'active' : ''}}">
-                            <a class="nav-link" href="{{ route('user.okazu', ['name' => Auth::user()->name]) }}">オカズ</a>
+                        <li class="nav-item {{ stripos(Route::currentRouteName(), 'timeline.public') === 0 ? 'active' : ''}}">
+                            <a class="nav-link" href="{{ route('timeline.public') }}">お惣菜</a>
                         </li>
                         <li class="nav-item {{ stripos(Route::currentRouteName(), 'tag') === 0 ? 'active' : ''}}">
                             <a class="nav-link" href="{{ route('tag') }}">タグ一覧</a>
@@ -93,7 +74,7 @@
                         <div class="input-group">
                             <input type="search" name="q" class="form-control" placeholder="検索..." value="{{ stripos(Route::currentRouteName(), 'search') === 0 ? $inputs['q'] : '' }}" required>
                             <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="submit"><span class="oi oi-magnifying-glass" aria-hidden="true"></span><span class="sr-only">検索</span></button>
+                                <button class="btn btn-outline-secondary" type="submit"><i class="ti ti-search" aria-hidden="true"></i><span class="sr-only">検索</span></button>
                             </div>
                         </div>
                     </form>
@@ -106,21 +87,7 @@
                                 <img src="{{ Auth::user()->getProfileImageUrl(30) }}" srcset="{{ Formatter::profileImageSrcSet(Auth::user(), 30) }}" width="30" height="30" class="rounded d-inline-block align-top">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                                <a href="{{ route('user.profile', ['name' => Auth::user()->name]) }}" class="dropdown-item">
-                                    <strong>{{ Auth::user()->display_name }}</strong>
-                                    <p class="mb-0 text-muted">
-                                        <span>&commat;{{ Auth::user()->name }}</span>
-                                    </p>
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ route('user.profile', ['name' => Auth::user()->name]) }}" class="dropdown-item">プロフィール</a>
-                                <a href="{{ route('user.likes', ['name' => Auth::user()->name]) }}" class="dropdown-item">いいね</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ route('setting') }}" class="dropdown-item">設定</a>
-                                @can ('admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item">管理</a>
-                                @endcan
-                                <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
+                                @include('components.header-dropdown-menu')
                             </div>
                         </li>
                     </ul>
@@ -132,15 +99,7 @@
                             <a class="btn btn-{{ stripos(Route::currentRouteName(), 'home') === 0 ? 'primary' : 'outline-secondary'}}" href="{{ route('home') }}" role="button">ホーム</a>
                         </div>
                         <div class="col">
-                            <a class="btn btn-{{ stripos(Route::currentRouteName(), 'user.profile') === 0 ? 'primary' : 'outline-secondary'}}" href="{{ route('user.profile', ['name' => Auth::user()->name]) }}" role="button">タイムライン</a>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col">
-                            <a class="btn btn-{{ stripos(Route::currentRouteName(), 'user.stats') === 0 ? 'primary' : 'outline-secondary'}}" href="{{ route('user.stats', ['name' => Auth::user()->name]) }}" role="button">グラフ</a>
-                        </div>
-                        <div class="col">
-                            <a class="btn btn-{{ stripos(Route::currentRouteName(), 'user.okazu') === 0 ? 'primary' : 'outline-secondary'}}" href="{{ route('user.okazu', ['name' => Auth::user()->name]) }}" role="button">オカズ</a>
+                            <a class="btn btn-{{ stripos(Route::currentRouteName(), 'timeline.public') === 0 ? 'primary' : 'outline-secondary'}}" href="{{ route('timeline.public') }}" role="button">お惣菜</a>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -160,7 +119,7 @@
                             <div class="input-group">
                                 <input type="search" name="q" class="form-control" placeholder="検索..." value="{{ stripos(Route::currentRouteName(), 'search') === 0 ? $inputs['q'] : '' }}" required>
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="submit"><span class="oi oi-magnifying-glass" aria-hidden="true"></span><span class="sr-only">検索</span></button>
+                                    <button class="btn btn-outline-secondary" type="submit"><i class="ti ti-search" aria-hidden="true"></i><span class="sr-only">検索</span></button>
                                 </div>
                             </div>
                         </form>
@@ -204,7 +163,7 @@
     </div>
 </nav>
 @if (session('status'))
-<div class="container">
+<div class="container tis-status-container">
     <div id="status" class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('status') }}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -216,13 +175,17 @@
 @yield('content')
 <footer class="tis-footer mt-4">
     <div class="container p-3 p-md-4">
-        <p>Copyright (c) 2017-2020 shikorism.net</p>
+        <p>Copyright (c) 2017-2024 shikorism.net</p>
         <ul class="list-inline">
             <li class="list-inline-item"><a href="https://github.com/shibafu528" class="text-dark">Admin(@shibafu528)</a></li>
             <li class="list-inline-item"><a href="https://github.com/shikorism/tissue" class="text-dark">GitHub</a></li>
+            <li class="list-inline-item"><a href="{{ url('/apidoc.html') }}" class="text-dark">API</a></li>
         </ul>
     </div>
 </footer>
+<div class="toast tis-toast">
+    <div class="toast-body"></div>
+</div>
 @guest
 <div class="modal fade" id="ageCheckModal" tabindex="-1" role="dialog" aria-labelledby="ageCheckModalTitle" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -241,9 +204,7 @@
   </div>
 </div>
 @endguest
-<script src="{{ mix('js/manifest.js') }}"></script>
-<script src="{{ mix('js/vendor.js') }}"></script>
-<script src="{{ mix('js/app.js') }}"></script>
+@vite('resources/assets/js/app.ts')
 @stack('script')
 </body>
 </html>

@@ -5,7 +5,7 @@ namespace App\MetadataResolver;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 
-class CienResolver extends MetadataResolver
+class CienResolver implements Resolver
 {
     /**
      * @var Client
@@ -25,14 +25,14 @@ class CienResolver extends MetadataResolver
     public function resolve(string $url): Metadata
     {
         $res = $this->client->get($url);
-        $metadata = $this->ogpResolver->parse((string) $res->getBody());
+        $html = (string) $res->getBody();
+        $metadata = $this->ogpResolver->parse($html);
 
-        // 画像URLから有効期限の起点を拾う
+        // パラメータにpx-timeがついていればpx-timeから有効期限を設定する
         parse_str(parse_url($metadata->image, PHP_URL_QUERY), $params);
-        if (empty($params['px-time'])) {
-            throw new \RuntimeException('Parameter "px-time" not found. Image=' . $metadata->image . ' Source=' . $url);
+        if (isset($params['px-time'])) {
+            $metadata->expires_at = Carbon::createFromTimestamp($params['px-time'])->addHour(1);
         }
-        $metadata->expires_at = Carbon::createFromTimestamp($params['px-time'])->addHour(1);
 
         return $metadata;
     }

@@ -3,7 +3,7 @@ version: 2.1
 executors:
   build:
     docker:
-      - image: circleci/php:7.3-node-browsers
+      - image: cimg/php:8.2-browsers
         environment:
           APP_DEBUG: true
           APP_ENV: testing
@@ -12,7 +12,7 @@ executors:
           DB_DATABASE: tissue
           DB_USERNAME: tissue
           DB_PASSWORD: tissue
-      - image: circleci/postgres:10-alpine
+      - image: cimg/postgres:14.2
         environment:
           POSTGRES_DB: tissue
           POSTGRES_USER: tissue
@@ -24,34 +24,29 @@ commands:
       - checkout
       - run: sudo apt update
       - run: sudo apt install -y libpq-dev
-      - run: sudo docker-php-ext-install zip
-      - run: sudo docker-php-ext-install pdo_pgsql
-      - run:
-          command: |
-            curl -sSL "https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v12.16.3-linux-x64/bin/node
-            curl https://www.npmjs.com/install.sh | sudo bash
+      - run: sudo pecl install -f xdebug
   restore_composer:
     steps:
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "composer.lock" }}
             - v1-dependencies-
   save_composer:
     steps:
       - save_cache:
-          key: v1-dependencies-{{ checksum "composer.json" }}
+          key: v1-dependencies-{{ checksum "composer.lock" }}
           paths:
             - ./vendor
   restore_npm:
     steps:
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "yarn.lock" }}
             - v1-dependencies-
   save_npm:
     steps:
       - save_cache:
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
             - ~/.yarn
@@ -99,32 +94,41 @@ jobs:
       - store_test_results:
           path: /tmp/php-cs-fixer
 
+      # Run tsc
+      - run:
+          name: tsc
+          command: yarn run lint:tsc
+          when: always
+
       # Run stylelint
       - run:
           name: stylelint
-          command: yarn run stylelint
+          command: yarn run lint:stylelint
           when: always
 
       # Run eslint
       - run:
           name: eslint
-          command: yarn run eslint
+          command: yarn run lint:eslint
           when: always
 
       # Run unit test
       - run:
           command: |
-            mkdir -p /tmp/phpunit
-            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml --coverage-clover=/tmp/phpunit/coverage.xml
+            php artisan passport:install -n
+            mkdir -p /tmp/phpunit{,-coverage}
+            ./vendor/bin/phpunit --log-junit /tmp/phpunit/phpunit.xml --coverage-clover=/tmp/phpunit-coverage/coverage.xml
           when: always
+          environment:
+            XDEBUG_MODE: coverage
       - store_test_results:
           path: /tmp/phpunit
       - store_artifacts:
-          path: /tmp/phpunit/coverage.xml
+          path: /tmp/phpunit-coverage/coverage.xml
 
       # Upload coverage
       - run:
-          command: bash <(curl -s https://codecov.io/bash) -f /tmp/phpunit/coverage.xml
+          command: bash <(curl -s https://codecov.io/bash) -f /tmp/phpunit-coverage/coverage.xml
           when: always
 
   test_resolver:
@@ -147,6 +151,8 @@ jobs:
             mkdir -p /tmp/phpunit
             ./vendor/bin/phpunit --testsuite MetadataResolver --log-junit /tmp/phpunit/phpunit.xml --coverage-clover=/tmp/phpunit/coverage.xml
           when: always
+          environment:
+            XDEBUG_MODE: coverage
       - store_test_results:
           path: /tmp/phpunit
       - store_artifacts:

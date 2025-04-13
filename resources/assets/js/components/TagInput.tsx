@@ -14,7 +14,7 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
     const containerClass = classNames('form-control', 'h-auto', { 'is-invalid': isInvalid });
     const inputRef = useRef<HTMLInputElement>(null);
     const removeTag = (index: number) => {
-        onChange && onChange(values.filter((v, i) => i != index));
+        onChange?.(values.filter((v, i) => i != index));
     };
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (buffer.trim() !== '') {
@@ -22,9 +22,8 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
                 case 'Tab':
                 case 'Enter':
                 case ' ':
-                    if ((event as any).isComposing !== true) {
-                        onChange && onChange(values.concat(buffer.trim().replace(/\s+/g, '_')));
-                        setBuffer('');
+                    if (!event.nativeEvent.isComposing) {
+                        commitBuffer();
                     }
                     event.preventDefault();
                     break;
@@ -32,8 +31,7 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
                     // 実際にテキストボックスに入力されている文字を見に行く (フォールバック処理)
                     const nativeEvent = event.nativeEvent;
                     if (nativeEvent.srcElement && (nativeEvent.srcElement as HTMLInputElement).value.slice(-1) == ' ') {
-                        onChange && onChange(values.concat(buffer.trim().replace(/\s+/g, '_')));
-                        setBuffer('');
+                        commitBuffer();
                         event.preventDefault();
                     }
                     break;
@@ -43,6 +41,13 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
             // 誤爆防止
             event.preventDefault();
         }
+    };
+
+    const commitBuffer = () => {
+        const newTag = buffer.trim().replace(/\s+/g, '_');
+        if (newTag.length === 0) return;
+        onChange?.(values.concat(newTag));
+        setBuffer('');
     };
 
     return (
@@ -55,7 +60,7 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
                         className={classNames('list-inline-item', 'badge', 'badge-primary', 'tis-tag-input-item')}
                         onClick={() => removeTag(i)}
                     >
-                        <span className="oi oi-tag" /> {tag} | x
+                        <i className="ti ti-tag-filled" /> {tag} | x
                     </li>
                 ))}
                 <li className="list-inline-item">
@@ -66,6 +71,7 @@ export const TagInput: React.FC<TagInputProps> = ({ id, name, values, isInvalid,
                         className="tis-tag-input-field"
                         value={buffer}
                         onChange={(e) => setBuffer(e.target.value)}
+                        onBlur={commitBuffer}
                         onKeyDown={onKeyDown}
                     />
                 </li>
